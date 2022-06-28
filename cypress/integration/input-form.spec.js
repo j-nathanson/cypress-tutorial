@@ -27,10 +27,47 @@ describe("Input Form", () => {
 
     // way of group test
     context('Form submission', () => {
-        it.only('Addas a new Todo on submit', () => {
+        beforeEach(() => {
+            cy.server() //start a server to stub responses
+        })
+
+
+        it('Add  a new Todo on submit', () => {
+            const itemText = 'Buy eggs'
+
+            cy.route('POST', '/api/todos', {
+                name: itemText,
+                id: 1,
+                isComplete: false
+            })
             cy.get('.new-todo')
-                .type('Buy eggs')
+                .type(itemText)
                 .type('{enter}') //press enter key
+                .should('have.value', '') //input should have cleared value
+
+            cy.get('.todo-list li')
+                .should('have.length', 1)
+                .and('contain', itemText)
+        })
+
+
+        it('Shows an error message on a failed submission', () => {
+            cy.route({
+                url: '/api/todos',
+                method: 'POST',
+                status: 500,
+                response: {}
+            })
+
+            cy.get('.new-todo')
+                .type('{enter}') //press enter key
+
+            // Assertions listed doesn't exist and error message is visable
+            cy.get('.todo-list li')
+                .should('not.exist')
+
+            cy.get('.error')
+                .should('be.visible')
         })
     })
 })
