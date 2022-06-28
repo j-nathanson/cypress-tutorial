@@ -2,7 +2,7 @@ describe("Input Form", () => {
     // before each test
     beforeEach(() => {
         // open page in the browser
-        cy.visit('/')
+        cy.seedAndVisit([]) //pass in empty array to override default values
     })
     it('focuses input on load', () => {
 
