@@ -21,7 +21,7 @@ describe('List items', () => {
             .should('contain', 3)
     })
 
-    it.only('Removes a todo', () => {
+    it('Removes a todo', () => {
         // listen for this route
         cy.route({
             url: '/api/todos/1',
@@ -46,5 +46,40 @@ describe('List items', () => {
         cy.get('@list')
             .should('have.length', 3)
             .and('not.contain', 'Milk')
+    })
+
+    it.only('Marks an incomplete item complete', () => {
+        // currently first todo item in fixtures is NOT complete
+        // cypress object comes loaded with lodash
+        // NOTE use 'fixture' instead of 'fixtureS'
+        cy.fixture('todos')
+            .then(todos => {
+                const target = Cypress._.head(todos) //first item of todos
+                cy.route(
+                    'PUT',
+                    `/api/todos/${target.id}`,
+                    Cypress._.merge(target, { isComplete: true })
+                )
+                // updates the todo with new isComplete value?
+            })
+
+        // make alias for the first todo item
+        cy.get('.todo-list li')
+            .first()
+            .as('first-todo')
+
+        // assert that it's toggle box is checked, i.e isComplete is true
+        cy.get('@first-todo')
+            .find('.toggle')
+            .click()
+            .should('be.checked')
+
+        // assert it has completed class
+        cy.get('@first-todo')
+            .should('have.class', 'completed')
+
+        // assert count is 2
+        cy.get('.todo-count')
+            .should('contain', 2)
     })
 })
