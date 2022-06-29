@@ -48,7 +48,7 @@ describe('List items', () => {
             .and('not.contain', 'Milk')
     })
 
-    it.only('Marks an incomplete item complete', () => {
+    it('Marks an incomplete item complete', () => {
         // currently first todo item in fixtures is NOT complete
         // cypress object comes loaded with lodash
         // NOTE use 'fixture' instead of 'fixtureS'
