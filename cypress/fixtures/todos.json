@@ -1,5 +1,4 @@
- [
-    {
+ [{
          "id": 1,
          "name": "Buy Milk",
          "isComplete": false
@@ -7,7 +6,7 @@
      {
          "id": 2,
          "name": "Buy Eggs",
-         "isComplete": false
+         "isComplete": true
      },
      {
          "id": 3,
