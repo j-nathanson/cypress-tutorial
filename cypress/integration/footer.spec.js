@@ -17,7 +17,7 @@ describe('Footer', () => {
                 .should('contain', '3 todos left') //one will be completed
         })
 
-        it.only('handles filter links', () => {
+        it('handles filter links', () => {
             //should only show uncompleted tasks
             //should only show completed tasks
             const filters = [
@@ -34,8 +34,6 @@ describe('Footer', () => {
                     cy.get('.todo-list li')
                         .should('have.length', filter.expectedLength)
                 })
-
         })
-
     })
 })

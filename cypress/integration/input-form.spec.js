@@ -35,6 +35,7 @@ describe("Input Form", () => {
         it('Add  a new Todo on submit', () => {
             const itemText = 'Buy eggs'
 
+            // Stubbing responses enables you to control every aspect of the response, including the response body, the status, headers, and even network delay.
             cy.route('POST', '/api/todos', {
                 name: itemText,
                 id: 1,
