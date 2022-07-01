@@ -8,7 +8,7 @@ describe('Smoke tests', () => {
   })
 
   context('With no todos', () => {
-    it.only('Saves new todos', () => {
+    it('Saves new todos', () => {
       // expected length of the todos array after adding the new todo
       const items = [
         { text: 'Buy Milk', expectedLength: 1 },
@@ -37,6 +37,67 @@ describe('Smoke tests', () => {
     })
   })
 
+  context('With active todos', () => {
+    beforeEach(() => {
+      // preset data into json.db
+      cy.fixture('todos')
+        .each(todo => {
+          const newTodo = Cypress._.merge(todo, { isComplete: false }) //override default  isComplete property
 
+          // make an http request
+          cy.request('POST', 'api/todos', newTodo)
+        })
+      cy.visit('/')
+    })
 
+    it('Loads existing data from the DB', () => {
+      cy.get('.todo-list li')
+        .should('have.length', 4)
+    })
+
+    it('Deletes todos', () => {
+      cy.server()
+      cy.route('DELETE', '/api/todos/*')
+        .as('delete') //use wildcard* in place of an id
+
+      cy.get('.todo-list li')
+        .each($el => {
+          cy.wrap($el)
+            .find('.destroy')
+            .invoke('show')
+            .click()
+
+          cy.wait('@delete')
+        })
+        .should('not.exist')
+    })
+
+    it('Toggles todos', () => {
+      const clickAndWait = ($el) => {
+        cy.wrap($el)
+          .as('item')
+          .find('.toggle')
+          .click() //triggers api call and adds/removes 'completed' class to item
+
+        cy.wait('@update')
+      }
+      cy.server()
+      cy.route('PUT', '/api/todos/*')
+        .as('update')
+
+      cy.get('.todo-list li')
+        // toggle to completed
+        .each($el => {
+          clickAndWait($el)
+          cy.get('@item')
+            .should('have.class', 'completed')
+        })
+        // toggle to uncompleted
+        .each($el => {
+          clickAndWait($el)
+          cy.get('@item')
+            .should('not.have.class', 'completed')
+        })
+    })
+  })
 })
